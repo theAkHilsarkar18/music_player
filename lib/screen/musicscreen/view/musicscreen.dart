@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/screen/musicscreen/provider/musicprovider.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,7 @@ class _MusicScreenState extends State<MusicScreen> {
         body: Stack(
           children: [
             Image.network(
-              "https://e0.pxfuel.com/wallpapers/331/708/desktop-wallpaper-fanmade-poster-pathaan-srk-shahrukhkhan.jpg",
+              "${musicProviderTrue!.bgImage}",
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -38,9 +39,9 @@ class _MusicScreenState extends State<MusicScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.network(
-                  "https://djmaza.live/siteuploads/thumb/sft18/8665_resize2x_200x200.webp",
-                  height: 150,
-                  width: 150,
+                  "${musicProviderTrue!.centerImage}",
+                  height: 130,
+                  width: 130,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -52,12 +53,41 @@ class _MusicScreenState extends State<MusicScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Slider(
-                      activeColor: Colors.white,
-                      inactiveColor: Colors.white54,
-                      value: 0.5, onChanged: (value) {
-
-                    },),
+                    PlayerBuilder.currentPosition(
+                      player: musicProviderFalse!.assetsAudioPlayer!,
+                      builder: (context, position) => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Slider(
+                            activeColor: Colors.white,
+                            inactiveColor: Colors.white54,
+                            max: musicProviderTrue!.totalDuration.inSeconds
+                                .toDouble(),
+                            value: position.inSeconds.toDouble(),
+                            onChanged: (value) {
+                              musicProviderFalse!.assetsAudioPlayer!
+                                  .seek(Duration(seconds: value.toInt()));
+                            },
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text("${position}",
+                                  style: TextStyle(color: Colors.white)),
+                              Spacer(),
+                              Text(
+                                  "${musicProviderTrue!.totalDuration.toString()}",
+                                  style: TextStyle(color: Colors.white)),
+                              SizedBox(
+                                width: 20,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                     Container(
                       height: 60,
                       width: double.infinity,
@@ -73,6 +103,13 @@ class _MusicScreenState extends State<MusicScreen> {
                         children: [
                           IconButton(
                             onPressed: () {
+                              musicProviderFalse!.previousSong();
+                            },
+                            icon:
+                                Icon(Icons.skip_previous, color: Colors.white),
+                          ),
+                          IconButton(
+                            onPressed: () {
                               musicProviderFalse!.startMusic();
                             },
                             icon: Icon(
@@ -86,8 +123,27 @@ class _MusicScreenState extends State<MusicScreen> {
                             },
                             icon: Icon(
                               Icons.pause,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                musicProviderFalse!.isMuteorUnmute();
+                              },
+                              icon: musicProviderTrue!.isMute
+                                  ? Icon(
+                                      Icons.volume_mute,
+                                      color: Colors.white,
+                                    )
+                                  : Icon(
+                                      Icons.volume_mute_outlined,
+                                      color: Colors.white,
+                                    )),
+                          IconButton(
+                            onPressed: () {
+                              musicProviderFalse!.nextSong();
+                            },
+                            icon: Icon(Icons.skip_next, color: Colors.white),
                           ),
                         ],
                       ),
